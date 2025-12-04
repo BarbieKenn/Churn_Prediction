@@ -1,1 +1,16 @@
-/.venv/
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Python
+venv/
+env/
+*.pyc
+__pycache__/
+*.so
+.Python
+*.egg-info/
+dist/
+build/
