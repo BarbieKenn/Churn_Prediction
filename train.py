@@ -2,7 +2,7 @@ import pandas as pd
 import joblib
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import recall_score, precision_score
 
 df_full = pd.read_csv('data/gym_members_dataset.csv')
@@ -26,16 +26,16 @@ y = df['Churn'].values
 y = pd.Series(y).map({'No': 0, 'Yes': 1}).values
 
 X_encoded = X.copy()
-le = LabelEncoder()
+he = OneHotEncoder()
 
-X_encoded[:, 1] = le.fit_transform(X[:, 1])
-X_encoded[:, 2] = le.fit_transform(X[:, 2])
+X_encoded[:, 1] = he.fit_transform(X[:, 1])
+X_encoded[:, 2] = he.fit_transform(X[:, 2])
 
 X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, random_state=42, stratify=y)
 
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 parameters = {
-    'max_depth': [1, 2, 3],
+    'max_depth': [1, 3, 5, 8, 12],
     'min_samples_split': [2, 5, 10],
     'min_samples_leaf': [1, 2, 4],
     'max_features': ['sqrt', 'log2', None]
