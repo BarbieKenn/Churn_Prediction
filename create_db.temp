@@ -1,0 +1,21 @@
+create table if not exists users (
+    id serial primary key,
+    Age int,
+    Membership_Type text,
+    Join_Date
+    Last_Visit_Date timestamp,
+    Favorite_Exercise text,
+    Avg_Workout_Duration_Min int,
+    Visits_Per_Month int
+);
+
+create table if not exists predictions (
+    id serial primary key,
+    user_id int,
+    proba double precision,
+    pred boolean
+);
+
+
+num_columns = ['Age', 'Avg_Workout_Duration_Min', 'Visits_Per_Month', 'Days_Since_Last_Visit']
+cat_columns = ['Membership_Type', 'Favorite_Exercise']
