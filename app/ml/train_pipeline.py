@@ -22,18 +22,24 @@ class Transformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X_copy = X.copy()
+
+        X_copy["Reference_Date"] = pd.to_datetime(X_copy["Reference_Date"])
+        ref_date = X_copy['Reference_Date']
+
         X_copy[self.last_date_col] = pd.to_datetime(X_copy[self.last_date_col])
-        ref_date = pd.Timestamp(self.reference_date)
         X_copy[self.last_out_col] = (ref_date - X_copy[self.last_date_col]).dt.days.clip(lower=0)
 
         X_copy[self.join_date_col] = pd.to_datetime(X_copy[self.join_date_col])
         X_copy[self.join_out_col] = (ref_date - X_copy[self.join_date_col]).dt.days.clip(lower=0)
 
-        return X_copy.drop(columns=[f'{self.last_date_col}', f'{self.join_date_col}'])
+        return X_copy.drop(columns=[f'{self.last_date_col}', f'{self.join_date_col}', 'Reference_Date'])
 
 
 df_full = pd.read_csv('../../data/gym_members_dataset.csv')
 df = df_full.drop(columns=['Member_ID', 'Name', 'Gender', 'Address', 'Phone_Number', 'Avg_Calories_Burned', 'Total_Weight_Lifted_kg'])
+
+ref_train = pd.to_datetime(df["Last_Visit_Date"]).max().normalize()
+df["Reference_Date"] = ref_train
 
 X = df.drop(columns=['Churn'])
 y = df['Churn'].values
@@ -104,3 +110,11 @@ robustness = pd.DataFrame({
     "importance": importance
 })
 print(robustness.nlargest(10, ['importance']))
+
+feat_out = pipe.named_steps["feat"].transform(X.copy())
+print("FEAT OUT:", feat_out.iloc[0].to_dict())
+
+# 2) что идёт в preprocess после отбора колонок
+print("COLUMNS AFTER FEAT:", feat_out.columns.tolist())
+
+print(df.groupby("Churn")["Visits_Per_Month"].describe())
